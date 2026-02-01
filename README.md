@@ -159,21 +159,19 @@ gtkwave async_fifo.vcd
 
 ## 🖼 Documentation Images
 
-Place these inside the **docs/** folder:
 
 | File                      | Purpose                    |
 | ------------------------- | -------------------------- |
 | `fifo_block_diagram.png`  | FIFO architecture overview |
 | `waveform_screenshot.png` | Simulation waveform proof  |
 
-Reference them in this README like:
 
 ```markdown
 ## Architecture Diagram
-![FIFO Block Diagram](docs/fifo_block_diagram.png)
+![FIFO Block Diagram] (docs/fifo_block_diagram.png)
 
 ## Verification Waveform
-![Simulation Waveform](docs/waveform_screenshot.png)
+![Simulation Waveform] (docs/waveform_screenshot.png)
 ```
 
 ---
