@@ -1,90 +1,132 @@
-Dual-Clock Asynchronous FIFO (Verilog)
+# Dual-Clock Asynchronous FIFO (Verilog)
 
-This project implements a Dual-Clock Asynchronous FIFO in Verilog, designed to safely transfer data between two independent clock domains using industry-standard Clock Domain Crossing (CDC) techniques.
+A **Dual-Clock Asynchronous FIFO** implemented in **Verilog HDL** for safe data transfer between **two independent clock domains**.
+This design follows **industry-standard Clock Domain Crossing (CDC)** practices and is suitable for FPGA-based digital systems and academic projects.
 
-📌 Project Overview
+---
 
-An asynchronous FIFO allows data transfer between two subsystems running on different clock frequencies. This design uses:
+## 📌 Project Overview
 
-Dual-Port RAM for storage
+An asynchronous FIFO enables reliable communication between subsystems running on **different clock frequencies** without data corruption.
 
-Binary counters for memory addressing
+This implementation uses:
 
-Gray code pointers for safe clock-domain crossing
+* **Dual-Port RAM** for storage
+* **Binary counters** for memory addressing
+* **Gray-coded pointers** for safe clock domain crossing
+* **2-Flip-Flop synchronizers** to reduce metastability risk
+* **FULL / EMPTY flags** for flow control
+* **ALMOST_FULL / ALMOST_EMPTY flags** for early warning
 
-2-Flip-Flop synchronizers for metastability protection
+This architecture is widely used in **SoCs, communication systems, DSP pipelines, and high-speed digital designs**.
 
-FULL / EMPTY and ALMOST flags
+---
 
-This architecture is commonly used in SoCs, communication systems, and high-speed digital designs.
+## 🧱 Architecture Blocks
 
+| Block                     | Description                                        |
+| ------------------------- | -------------------------------------------------- |
+| **Write Pointer Handler** | Maintains write pointer in binary and Gray formats |
+| **Read Pointer Handler**  | Maintains read pointer in binary and Gray formats  |
+| **Dual-Port RAM**         | Stores FIFO data using binary addresses            |
+| **2-FF Synchronizers**    | Safely transfer Gray pointers across clock domains |
+| **Full Flag Logic**       | Detects FIFO full condition in write domain        |
+| **Empty Flag Logic**      | Detects FIFO empty condition in read domain        |
 
-Major Blocks
-Block	Description
-Write Pointer Handler	Maintains write pointer in binary and Gray format
-Read Pointer Handler	Maintains read pointer in binary and Gray format
-Dual-Port RAM	Stores FIFO data using binary addresses
-2-FF Synchronizers	Safely transfer Gray pointers across clock domains
-Full Flag Logic	Detects FIFO full condition in write domain
-Empty Flag Logic	Detects FIFO empty condition in read domain
-🔄 FIFO Operation
-Write Clock Domain (wr_clk)
+---
 
-wr_en writes din into memory
+## 🔄 FIFO Operation
 
-Binary write pointer increments
+### Write Clock Domain (`wr_clk`)
 
-Binary pointer converted to Gray
+* `wr_en` writes `din` into FIFO memory
+* Binary write pointer increments
+* Binary pointer converted to Gray code
+* Gray pointer synchronized into read clock domain
+* `full` and `almost_full` flags generated
 
-Gray pointer sent to read domain via 2-FF synchronizer
+### Read Clock Domain (`rd_clk`)
 
-FULL and ALMOST_FULL flags generated
+* `rd_en` reads FIFO data into `dout`
+* Binary read pointer increments
+* Binary pointer converted to Gray code
+* Gray pointer synchronized into write clock domain
+* `empty` and `almost_empty` flags generated
 
-Read Clock Domain (rd_clk)
+---
 
-rd_en reads data from memory into dout
+## ⚙️ CDC Safety Techniques
 
-Binary read pointer increments
+| Signal Type                   | CDC Method Used                            |
+| ----------------------------- | ------------------------------------------ |
+| Pointer transitions           | Gray coding (only 1 bit changes at a time) |
+| Cross-domain pointer transfer | 2-Flip-Flop synchronizers                  |
+| Full/Empty detection          | Gray pointer comparison                    |
 
-Binary pointer converted to Gray
+---
 
-Gray pointer sent to write domain via 2-FF synchronizer
+## ⚠️ Design Limitations
 
-EMPTY and ALMOST_EMPTY flags generated
+This FIFO is **functionally correct and CDC-safe for FPGA and educational use**, but has the following limitations:
 
-⚙️ CDC Safety
-Signal Type	CDC Method
-Pointers	Gray coding (1 bit changes at a time)
-Cross-domain transfer	2-Flip-Flop synchronizers
-Full/Empty detection	Gray pointer comparison
+1. **ALMOST flags are not fully CDC-clean**
 
-⚠️ Note: almost_full and almost_empty use Gray→Binary conversion for arithmetic comparison. This is safe for FPGA/student projects but not strictly CDC-clean for advanced ASIC flows. FULL and EMPTY flags remain CDC-safe.
+   * `almost_full` and `almost_empty` convert synchronized Gray pointers back to binary
+   * This can introduce small metastability risk in strict ASIC flows
 
-🧪 Verification
+2. **No ECC or parity protection**
 
-The FIFO is verified using a self-checking testbench with:
+   * Memory corruption detection is not included
 
-Independent write and read clocks
+3. **Depth must be power of 2**
 
-Randomized write/read bursts
+   * Required for proper Gray code pointer wrapping
 
-Scoreboard-based data integrity check
+4. **Not formally verified**
 
-Waveform inspection
+   * Verified through simulation only
 
-✅ Verification Result
+5. **No backpressure beyond flags**
+
+   * System using FIFO must obey `full` and `empty` signals
+
+---
+
+## 🧪 Verification Method
+
+A **self-checking testbench** is used to verify correctness.
+
+Verification features:
+
+* Independent write and read clocks
+* Burst write and read sequences
+* Scoreboard-based data integrity checking
+* Pointer tracking for output validation
+* Waveform inspection using GTKWave
+
+### ✅ Verification Results
 
 ✔ No data loss
 ✔ No duplication
-✔ Correct order maintained
+✔ Data order maintained
+✔ Correct flag behavior observed
 
-🛠 Tools Used
-Tool	Purpose
-Icarus Verilog	Simulation
-GTKWave	Waveform viewing
-VS Code / Any Editor	RTL coding
-GitHub	Version control & project hosting
-📂 Project Structure
+---
+
+## 🛠 Tools Used
+
+| Tool                     | Purpose                     |
+| ------------------------ | --------------------------- |
+| **Icarus Verilog**       | Simulation                  |
+| **GTKWave**              | Waveform visualization      |
+| **VS Code / Any Editor** | RTL development             |
+| **GitHub**               | Version control and hosting |
+
+---
+
+## 📂 Project Structure
+
+```
 async-fifo/
 │
 ├── rtl/
@@ -101,30 +143,44 @@ async-fifo/
 │   └── waveform_screenshot.png
 │
 └── README.md
+```
 
-▶️ How to Run Simulation
+---
+
+## ▶️ How to Run Simulation
+
+```bash
 iverilog -o fifo_sim rtl/async_fifo.v tb/async_fifo_tb.v
 vvp fifo_sim
 gtkwave async_fifo.vcd
+```
 
-🖼 Where to Upload Images
-Image	Upload Folder	Purpose
-Block Diagram	/docs/fifo_block_diagram.png	Architecture explanation
-Waveform Screenshot	/docs/waveform_screenshot.png	Verification proof
+---
 
-Then reference them in README like this:
+## 🖼 Documentation Images
 
+Place these inside the **docs/** folder:
+
+| File                      | Purpose                    |
+| ------------------------- | -------------------------- |
+| `fifo_block_diagram.png`  | FIFO architecture overview |
+| `waveform_screenshot.png` | Simulation waveform proof  |
+
+Reference them in this README like:
+
+```markdown
+## Architecture Diagram
 ![FIFO Block Diagram](docs/fifo_block_diagram.png)
+
+## Verification Waveform
 ![Simulation Waveform](docs/waveform_screenshot.png)
+```
 
-🚀 Skills Demonstrated
+---
 
-Clock Domain Crossing (CDC)
+## 📜 License
 
-Asynchronous FIFO architecture
+This project is released under the **MIT License**.
+You are free to use, modify, and distribute this design with attribution.
 
-Gray code pointer design
-
-RTL design in Verilog
-
-Digital verification methodology
+---
