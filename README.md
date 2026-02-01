@@ -166,12 +166,12 @@ gtkwave async_fifo.vcd
 | `waveform_screenshot.png` | Simulation waveform proof  |
 
 
-```markdown
 ## Architecture Diagram
-![FIFO Block Diagram] (docs/fifo_block_diagram.png)
+![FIFO Block Diagram](docs/fifo_block_diagram.png)
 
-## Verification Waveform
-![Simulation Waveform] (docs/waveform_screenshot.png)
+## Simulation Waveform
+![Simulation Waveform](docs/waveform_screenshot.png)
+
 ```
 
 ---
