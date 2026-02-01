@@ -172,9 +172,6 @@ gtkwave async_fifo.vcd
 ## Simulation Waveform
 ![Simulation Waveform](docs/waveform_screenshot.png)
 
-```
-
----
 
 ## 📜 License
 
