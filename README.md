@@ -172,7 +172,30 @@ gtkwave async_fifo.vcd
 ## Simulation Waveform
 ![Simulation Waveform](docs/waveform_screenshot.png)
 
+## 🔧 Example Instantiation
 
+Below is an example of how this FIFO can be instantiated inside a Verilog design:
+
+``` verilog
+async_fifo #(
+    .DATA_WIDTH(8),
+    .DEPTH(16)
+) fifo_inst (
+    .wr_clk(wr_clk),
+    .wr_rst(wr_rst),
+    .wr_en(wr_en),
+    .din(din),
+    .full(full),
+    .almost_full(almost_full),
+    .rd_clk(rd_clk),
+    .rd_rst(rd_rst),
+    .rd_en(rd_en),
+    .dout(dout),
+    .empty(empty),
+    .almost_empty(almost_empty)
+);
+```
+ 
 ## 📜 License
 
 This project is released under the **MIT License**.
